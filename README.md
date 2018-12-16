@@ -26,13 +26,18 @@ in production using [12-factor](http://12factor.net/) principles.
 
 > Hey just wanted to let you know that since I've started writing 12-factor apps I've found python-dotenv to be invaluable for all my projects. It's super useful and “just works.” --Daniel Fridkin
 
+Installation
+============
+
+    pip install -U python-dotenv
+
 Usages
 ======
 
 The easiest and most common usage consists on calling `load_dotenv` when
 the application starts, which will load environment variables from a
-file named `.env` in the current directory or any of its parents or from
-the path specificied; after that, you can just call the
+file named `.env` in the current directory, any of its parents or from
+the path specified; after that, you can just call the
 environment-related method you need as provided by `os.getenv`.
 
 `.env` looks like this:
@@ -42,6 +47,8 @@ environment-related method you need as provided by `os.getenv`.
 REDIS_ADDRESS=localhost:6379
 MEANING_OF_LIFE=42
 MULTILINE_VAR="hello\nworld"
+MULTILINE_VAR2="hello
+world"
 ```
 
 You can optionally prefix each line with the word `export`, which will
@@ -96,6 +103,8 @@ SECRET_KEY = os.getenv("EMAIL")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 ```
 
+`os.getenv` works but it can be tricky as times as the returned value is always a string. dotenv provides it's own version of [`getenv`](#reading-envvars-in-your-application) that handle type casting like `bool`, `int`, etc.
+
 `load_dotenv` do not override existing System environment variables. To
 override, pass `override=True` to `load_dotenv()`.
 
@@ -138,11 +147,6 @@ Django
 
 If you are using django you should add the above loader script at the
 top of `wsgi.py` and `manage.py`.
-
-Installation
-============
-
-    pip install -U python-dotenv
 
 iPython Support
 ---------------
@@ -254,6 +258,97 @@ commands like so
 
     $ fab config:set,hello,world config:set,foo,bar config:set,fizz=buzz
 
+
+Reading envvars in your application
+==============================================
+
+Envvars works, but since `os.environ` or `os.getenv` only returns strings, it’s tricky.
+
+Let’s say you have an envvar `DEBUG=False`. If you run:
+
+```
+if os.environ['DEBUG']:
+    print True
+else:
+    print False
+```
+
+It will print `True`, because `os.environ['DEBUG']` returns the string `"False"`. Since it’s a non-empty string, it will be evaluated as `True`.
+
+python-dotenv provides a solution that doesn’t look like a workaround: `getenv('DEBUG', cast=bool)`.
+
+```
+from dotenv import env
+
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env.bool('DEBUG', default=False)
+EMAIL_HOST = env('EMAIL_HOST', default='localhost')
+EMAIL_PORT = env.int('EMAIL_PORT', default=25)
+```
+
+**Understanding the CAST argument**
+
+By default, all values returned by `env` are strings, after all they are read from the envvars.
+
+However, your Python code may expect some other value type, for example:
+
+* Django’s DEBUG expects a boolean True or False.
+* Django’s EMAIL_PORT expects an integer.
+* Django’s ALLOWED_HOSTS expects a list of hostnames.
+* Django’s SECURE_PROXY_SSL_HEADER expects a tuple with two elements, the name of the header to look for and the required value.
+
+To meet this need, the `env` function accepts a `cast` argument which receives any callable, that will be used to transform the string value into something else.
+
+Let’s see some examples for the above mentioned cases:
+
+```
+>>> os.environ['DEBUG'] = 'False'
+>>> env('DEBUG', cast=bool)
+False
+
+>>> os.environ['EMAIL_PORT'] = '42'
+>>> env('EMAIL_PORT', cast=int)
+42
+
+>>> os.environ['ALLOWED_HOSTS'] = '.localhost, .herokuapp.com'
+>>> env('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+['.localhost', '.herokuapp.com']
+```
+
+As you can see, cast is very flexible. But the last example got a bit complex.
+
+**Built in Csv Helper**
+
+To address the complexity of the last example, Decouple comes with an extensible Csv helper.
+
+Let’s improve the last example:
+
+```
+>>> os.environ['ALLOWED_HOSTS'] = '.localhost, .herokuapp.com'
+>>> env.csv('ALLOWED_HOSTS')
+['.localhost', '.herokuapp.com']
+```
+
+You can also parametrize the csv Helper to return other types of data.
+
+```
+>>> os.environ['LIST_OF_INTEGERS'] = '1,2,3,4,5'
+>>> env.csv('LIST_OF_INTEGERS', cast=int)
+[1, 2, 3, 4, 5]
+
+>>> os.environ['COMPLEX_STRING'] = '%virtual_env%\t *important stuff*\t   trailing spaces   '
+>>> env.csv('COMPLEX_STRING', cast=lambda s: s.upper(), delimiter='\t', strip=' %*')
+['VIRTUAL_ENV', 'IMPORTANT STUFF', 'TRAILING SPACES']
+```
+
+By default `Csv` returns a `list`, but you can get a tuple or whatever you want using the `post_process` argument:
+
+```
+>>> os.environ['SECURE_PROXY_SSL_HEADER'] = 'HTTP_X_FORWARDED_PROTO, https'
+>>> env.csv('SECURE_PROXY_SSL_HEADER', post_process=tuple)
+('HTTP_X_FORWARDED_PROTO', 'https')
+```
+
 Related Projects
 ================
 
@@ -283,6 +378,10 @@ Executing the tests:
 
 Changelog
 =========
+
+dev
+-----
+- Add `dotenv.env()` function to parse envvars
 
 0.10.1
 -----

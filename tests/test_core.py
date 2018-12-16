@@ -155,8 +155,7 @@ def test_load_dotenv(cli):
         sh.touch(dotenv_path)
         set_key(dotenv_path, 'DOTENV', 'WORKS')
         assert 'DOTENV' not in os.environ
-        success = load_dotenv(dotenv_path)
-        assert success
+        load_dotenv(dotenv_path)
         assert 'DOTENV' in os.environ
         assert os.environ['DOTENV'] == 'WORKS'
         sh.rm(dotenv_path)
@@ -170,8 +169,7 @@ def test_load_dotenv_override(cli):
         sh.touch(dotenv_path)
         os.environ[key_name] = "OVERRIDE"
         set_key(dotenv_path, key_name, 'WORKS')
-        success = load_dotenv(dotenv_path, override=True)
-        assert success
+        load_dotenv(dotenv_path, override=True)
         assert key_name in os.environ
         assert os.environ[key_name] == 'WORKS'
         sh.rm(dotenv_path)
@@ -184,8 +182,7 @@ def test_load_dotenv_in_current_dir():
     with open(dotenv_path, 'w') as f:
         f.write("TOTO=bla\n")
     assert 'TOTO' not in os.environ
-    success = load_dotenv(verbose=True)
-    assert success
+    load_dotenv(verbose=True)
     assert os.environ['TOTO'] == 'bla'
     sh.rm(dotenv_path)
 

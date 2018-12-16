@@ -14,6 +14,7 @@ from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 
 from .compat import StringIO, PY2, WIN, text_type
+from .environ import env
 
 __posix_variable = re.compile(r'\$\{[^\}]*\}')
 
@@ -306,7 +307,8 @@ def find_dotenv(filename='.env', raise_error_if_not_found=False, usecwd=False):
 
 def load_dotenv(dotenv_path=None, stream=None, verbose=False, override=False):
     f = dotenv_path or stream or find_dotenv()
-    return DotEnv(f, verbose=verbose).set_as_environment_variables(override=override)
+    DotEnv(f, verbose=verbose).set_as_environment_variables(override=override)
+    return env
 
 
 def dotenv_values(dotenv_path=None, stream=None, verbose=False):

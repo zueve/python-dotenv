@@ -1,4 +1,5 @@
 from .main import load_dotenv, get_key, set_key, unset_key, find_dotenv, dotenv_values
+from .environ import env
 
 
 def load_ipython_extension(ipython):
@@ -36,5 +37,6 @@ __all__ = ['get_cli_string',
            'get_key',
            'set_key',
            'unset_key',
+           'env',
            'find_dotenv',
            'load_ipython_extension']
