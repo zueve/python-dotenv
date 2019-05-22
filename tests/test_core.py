@@ -79,8 +79,7 @@ def test_load_dotenv(tmp_path):
     sh.touch(dotenv_path)
     set_key(dotenv_path, 'DOTENV', 'WORKS')
     assert 'DOTENV' not in os.environ
-    success = load_dotenv(dotenv_path)
-    assert success
+    load_dotenv(dotenv_path)
     assert 'DOTENV' in os.environ
     assert os.environ['DOTENV'] == 'WORKS'
 
@@ -92,8 +91,7 @@ def test_load_dotenv_override(tmp_path):
     sh.touch(dotenv_path)
     os.environ[key_name] = "OVERRIDE"
     set_key(dotenv_path, key_name, 'WORKS')
-    success = load_dotenv(dotenv_path, override=True)
-    assert success
+    load_dotenv(dotenv_path, override=True)
     assert key_name in os.environ
     assert os.environ[key_name] == 'WORKS'
 

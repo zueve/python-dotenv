@@ -7,7 +7,7 @@ import re
 import shutil
 import sys
 import tempfile
-from typing import (Dict, Iterator, List, Match, Optional,  # noqa
+from typing import (Any, Dict, Iterator, List, Match, Optional,  # noqa
                     Pattern, Union, TYPE_CHECKING, Text, IO, Tuple)
 import warnings
 from collections import OrderedDict
@@ -32,12 +32,13 @@ __posix_variable = re.compile(r'\$\{[^\}]*\}')  # type: Pattern[Text]
 
 class DotEnv():
 
-    def __init__(self, dotenv_path, verbose=False, encoding=None):
-        # type: (Union[Text, _PathLike, _StringIO], bool, Union[None, Text]) -> None
+    def __init__(self, dotenv_path, verbose=False, encoding=None, override=False):
+        # type: (Union[Text, _PathLike, _StringIO], bool, Union[None, Text], bool) -> None
         self.dotenv_path = dotenv_path  # type: Union[Text,_PathLike, _StringIO]
         self._dict = None  # type: Optional[Dict[Text, Text]]
         self.verbose = verbose  # type: bool
         self.encoding = encoding  # type: Union[None, Text]
+        self.override = override  # type: bool
 
     @contextmanager
     def _get_stream(self):
@@ -69,17 +70,15 @@ class DotEnv():
                 if mapping.key is not None and mapping.value is not None:
                     yield mapping.key, mapping.value
 
-    def set_as_environment_variables(self, override=False):
-        # type: (bool) -> bool
+    def set_as_environment_variables(self):
+        # type: () -> None
         """
         Load the current dotenv as system environemt variable.
         """
         for k, v in self.dict().items():
-            if k in os.environ and not override:
+            if k in os.environ and not self.override:
                 continue
             os.environ[to_env(k)] = to_env(v)
-
-        return True
 
     def get(self, key):
         # type: (Text) -> Optional[Text]
@@ -265,13 +264,13 @@ def find_dotenv(filename='.env', raise_error_if_not_found=False, usecwd=False):
     return ''
 
 
-def load_dotenv(dotenv_path=None, stream=None, verbose=False, override=False, **kwargs):
-    # type: (Union[Text, _PathLike, None], Optional[_StringIO], bool, bool, Union[None, Text]) -> bool
+def load_dotenv(dotenv_path=None, stream=None, **kwargs):
+    # type: (Union[Text, _PathLike, None], Optional[_StringIO], **Any) -> None
     f = dotenv_path or stream or find_dotenv()
-    return DotEnv(f, verbose=verbose, **kwargs).set_as_environment_variables(override=override)
+    return DotEnv(f, **kwargs).set_as_environment_variables()
 
 
-def dotenv_values(dotenv_path=None, stream=None, verbose=False, **kwargs):
-    # type: (Union[Text, _PathLike, None], Optional[_StringIO], bool, Union[None, Text]) -> Dict[Text, Text]
+def dotenv_values(dotenv_path=None, stream=None, **kwargs):
+    # type: (Union[Text, _PathLike, None], Optional[_StringIO], **Any) -> Dict[Text, Text]
     f = dotenv_path or stream or find_dotenv()
-    return DotEnv(f, verbose=verbose, **kwargs).dict()
+    return DotEnv(f, **kwargs).dict()
