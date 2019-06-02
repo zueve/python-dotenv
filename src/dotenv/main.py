@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
+import inspect
 import io
 import os
 import re
@@ -235,12 +236,19 @@ def find_dotenv(filename='.env', raise_error_if_not_found=False, usecwd=False):
 
     Returns path to the file if found, or an empty string otherwise
     """
-    if usecwd or '__file__' not in globals():
+
+    def _is_interactive():
+        """Decide whether this is running in a REPL or IPython notebook
+        """
+        main = __import__('__main__', None, None, fromlist=['__file__'])
+        return not hasattr(main, '__file__')
+
+    if usecwd or _is_interactive():
         # should work without __file__, e.g. in REPL or IPython notebook
         path = os.getcwd()
     else:
         # will work for .py files
-        frame = sys._getframe()
+        frames = inspect.getouterframes(inspect.currentframe())
         # find first frame that is outside of this file
         if PY2 and not __file__.endswith('.py'):
             # in Python2 __file__ extension could be .pyc or .pyo (this doesn't account
@@ -249,10 +257,10 @@ def find_dotenv(filename='.env', raise_error_if_not_found=False, usecwd=False):
         else:
             current_file = __file__
 
-        while frame.f_code.co_filename == current_file:
-            frame = frame.f_back
-        frame_filename = frame.f_code.co_filename
-        path = os.path.dirname(os.path.abspath(frame_filename))
+        for frame in frames:
+            if frame.filename != current_file:
+                break
+        path = os.path.dirname(os.path.abspath(frame.filename))
 
     for dirname in _walk_to_root(path):
         check_path = os.path.join(dirname, filename)
