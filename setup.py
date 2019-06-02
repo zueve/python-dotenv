@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-# https://github.com/theskumar/python-dotenv/issues/45#issuecomment-277135416
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-    long_description = long_description.replace("\r", "")  # YOU  NEED THIS LINE
-except (OSError, ImportError):
-    print("Pandoc not found. Long_description conversion failure.")
-    import io
-    # pandoc is not installed, fallback to using raw contents
-    with io.open('README.md', encoding="utf-8") as f:
-        long_description = f.read()
+with open('README.md') as f:
+    long_description = f.read()
+
+meta = {}
+with open('./src/dotenv/version.py') as f:
+    exec(f.read(), meta)
 
 setup(
     name="python-dotenv",
     description="Add .env support to your django/flask apps in development and deployments",
     long_description=long_description,
-    version="0.8.2",
+    long_description_content_type='text/markdown',
+    version=meta['__version__'],
     author="Saurabh Kumar",
     author_email="me+github@saurabh-kumar.com",
     url="http://github.com/theskumar/python-dotenv",
     keywords=['environment variables', 'deployments', 'settings', 'env', 'dotenv',
               'configurations', 'python'],
     packages=['dotenv'],
+    package_dir={'': 'src'},
+    package_data={
+        'dotenv': ['py.typed'],
+    },
+    install_requires=[
+        "typing; python_version<'3.5'",
+    ],
     extras_require={
         'cli': ['click>=5.0', ],
     },
@@ -41,20 +44,21 @@ setup(
         # 'Development Status :: 6 - Mature',
         # 'Development Status :: 7 - Inactive',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        # 'Programming Language :: Python :: 2',
         # 'Programming Language :: Python :: 2.3',
         # 'Programming Language :: Python :: 2.4',
         # 'Programming Language :: Python :: 2.5',
         # 'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.0',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
+        # 'Programming Language :: Python :: 3',
+        # 'Programming Language :: Python :: 3.0',
+        # 'Programming Language :: Python :: 3.1',
+        # 'Programming Language :: Python :: 3.2',
+        # 'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
