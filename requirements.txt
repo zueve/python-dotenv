@@ -1,8 +1,9 @@
 bumpversion
 typing; python_version<"3.5"
-click
+click==7.0
 flake8>=2.2.3
 ipython
+mock
 pytest-cov
 pytest>=3.9
 sh>=1.09

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+import io
 from setuptools import setup
 
 
 def read_files(files):
     data = []
     for file in files:
-        with open(file) as f:
+        with io.open(file, encoding='utf-8') as f:
             data.append(f.read())
     return "\n".join(data)
 
@@ -13,7 +14,7 @@ def read_files(files):
 long_description = read_files(['README.md', 'CHANGELOG.md'])
 
 meta = {}
-with open('./src/dotenv/version.py') as f:
+with io.open('./src/dotenv/version.py', encoding='utf-8') as f:
     exec(f.read(), meta)
 
 setup(
@@ -43,30 +44,15 @@ setup(
         dotenv=dotenv.cli:cli
     ''',
     classifiers=[
-        # As from https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        # 'Development Status :: 1 - Planning',
-        # 'Development Status :: 2 - Pre-Alpha',
-        # 'Development Status :: 3 - Alpha',
-        # 'Development Status :: 4 - Beta',
         'Development Status :: 5 - Production/Stable',
-        # 'Development Status :: 6 - Mature',
-        # 'Development Status :: 7 - Inactive',
         'Programming Language :: Python',
-        # 'Programming Language :: Python :: 2',
-        # 'Programming Language :: Python :: 2.3',
-        # 'Programming Language :: Python :: 2.4',
-        # 'Programming Language :: Python :: 2.5',
-        # 'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        # 'Programming Language :: Python :: 3',
-        # 'Programming Language :: Python :: 3.0',
-        # 'Programming Language :: Python :: 3.1',
-        # 'Programming Language :: Python :: 3.2',
-        # 'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
@@ -77,9 +63,3 @@ setup(
         'Environment :: Web Environment',
     ]
 )
-
-# (*) Please direct queries to the discussion group, rather than to me directly
-#     Doing so helps ensure your question is helpful to other users.
-#     Queries directly to my email are likely to receive a canned response.
-#
-#     Many thanks for your understanding.
