@@ -544,16 +544,20 @@ environment-related method you need as provided by <code>os.getenv</code>.</p>
 </code></pre></div>
 
 
-<p><code>.env</code> can interpolate variables using POSIX variable expansion,
-variables are replaced from the environment first or from other values
-in the <code>.env</code> file if the variable is not present in the environment. 
-Ensure that variables are surrounded with <code>{}</code> like <code>${HOME}</code> as bare 
-variables such as <code>$HOME</code> are not expanded.
-(<strong>Note</strong>: Default Value Expansion is not supported as of yet, see
-<a href="https://github.com/theskumar/python-dotenv/pull/30#issuecomment-244036604">#30</a>.)</p>
+<p>Python-dotenv can interpolate variables using POSIX variable expansion.</p>
+<p>The value of a variable is the first of the values defined in the following list:</p>
+<ul>
+<li>Value of that variable in the environment.</li>
+<li>Value of that variable in the <code>.env</code> file.</li>
+<li>Default value, if provided.</li>
+<li>Empty string.</li>
+</ul>
+<p>Ensure that variables are surrounded with <code>{}</code> like <code>${HOME}</code> as bare 
+variables such as <code>$HOME</code> are not expanded.</p>
 <div class="codehilite"><pre><span></span><code><span class="nv">CONFIG_PATH</span><span class="o">=</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span>/.config/foo
 <span class="nv">DOMAIN</span><span class="o">=</span>example.org
 <span class="nv">EMAIL</span><span class="o">=</span>admin@<span class="si">${</span><span class="nv">DOMAIN</span><span class="si">}</span>
+<span class="nv">DEBUG</span><span class="o">=</span><span class="si">${</span><span class="nv">DEBUG</span><span class="k">:-</span><span class="nv">false</span><span class="si">}</span>
 </code></pre></div>
 
 

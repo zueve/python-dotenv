@@ -658,6 +658,8 @@
 
 <span class="s1">        while frame.f_code.co_filename == current_file:</span>
 
+<span class="s1">            assert frame.f_back is not None</span>
+
 <span class="s1">            frame = frame.f_back</span>
 
 <span class="s1">        frame_filename = frame.f_code.co_filename</span>
