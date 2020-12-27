@@ -1,21 +1,21 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Tests
+name: Run Tests
 
-on: [push]
+on: ["push", "pull_request"]
 
 jobs:
-  build:
+  test:
 
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 4
+      max-parallel: 8
       matrix:
         os:
           - ubuntu-latest #
           # - windows-latest # windows-2019
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9-dev, pypy2, pypy3]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, pypy2, pypy3]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,3 +29,18 @@ jobs:
         pip install tox tox-gh-actions
     - name: Test with tox
       run: tox
+
+    - name: Coveralls
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel: true
+        flag-name: run-${{ matrix.python-version }}
+
+  coveralls_finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
