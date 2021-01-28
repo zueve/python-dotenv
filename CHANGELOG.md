@@ -7,7 +7,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-- Fix resolution order in variable expansion with `override=False` (#? by [@bbc2]).
+### Added
+
+- Add `--override`/`--no-override` option to `dotenv run` (#303 by [@zueve] and [@bbc2]).
+
+### Fixed
+
+- Fix resolution order in variable expansion with `override=False` (#287 by [@bbc2]).
 
 ## [0.15.0] - 2020-10-28
 
@@ -234,6 +240,7 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [@venthur]: https://github.com/venthur
 [@x-yuri]: https://github.com/x-yuri
 [@yannham]: https://github.com/yannham
+[@zueve]: https://github.com/zueve
 
 [Unreleased]: https://github.com/theskumar/python-dotenv/compare/v0.15.0...HEAD
 [0.15.0]: https://github.com/theskumar/python-dotenv/compare/v0.14.0...v0.15.0
